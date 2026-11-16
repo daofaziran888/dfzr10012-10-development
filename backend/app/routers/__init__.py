@@ -10,6 +10,7 @@ from app.routers import streamin as router_streamin
 from app.routers import operator as router_operator
 from app.routers import window as router_window
 from app.routers import state as router_state
+from app.routers import snapshot as router_snapshot
 from app.routers import checkpoint as router_checkpoint
 from app.routers import backpress as router_backpress
 from app.routers import latency as router_latency
@@ -23,4 +24,4 @@ from app.routers import alarm as router_alarm
 from app.routers import udf as router_udf
 from app.routers import log as router_log
 
-ROUTERS = [router_streamin, router_operator, router_window, router_state, router_checkpoint, router_backpress, router_latency, router_jobops, router_sink, router_schema, router_watermark, router_parallel, router_metric, router_alarm, router_udf, router_log]
+ROUTERS = [router_streamin, router_operator, router_window, router_state, router_snapshot, router_checkpoint, router_backpress, router_latency, router_jobops, router_sink, router_schema, router_watermark, router_parallel, router_metric, router_alarm, router_udf, router_log]

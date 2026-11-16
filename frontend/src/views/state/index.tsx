@@ -45,6 +45,7 @@ export default function StateView() {
   const [rows, setRows] = useState<Row[]>([])
   const [total, setTotal] = useState(0)
   const [errorMessage, setErrorMessage] = useState('')
+  const [infoMessage, setInfoMessage] = useState('')
   const [filters, setFilters] = useState<Record<string, string>>({})
   const filterFields = useMemo(() => columns.slice(0, 3), [])
 
@@ -70,6 +71,7 @@ export default function StateView() {
 
   async function runAction(action: string, row: Row) {
     setErrorMessage('')
+    setInfoMessage('')
     try {
       const response = await request(`${ENDPOINT}/${row.id}/actions`, {
         method: 'POST',
@@ -81,6 +83,21 @@ export default function StateView() {
       await reload()
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : '状态后端管理操作失败')
+    }
+  }
+
+  async function runInventory(row: Row) {
+    setErrorMessage('')
+    setInfoMessage('')
+    try {
+      const response = await request(`${ENDPOINT}/${row.id}/inventory`, { method: 'POST' })
+      const payload = await response.json()
+      if (!response.ok || !payload.ok) {
+        throw new Error(payload.message || '快照盘点未生效，请稍后重试')
+      }
+      setInfoMessage(`${payload.message}，可前往「状态快照清单」查看`)
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : '快照盘点操作失败')
     }
   }
 
@@ -142,6 +159,9 @@ export default function StateView() {
                     {action}
                   </button>
                 ))}
+                <button className="link" type="button" onClick={() => void runInventory(row)}>
+                  快照盘点
+                </button>
               </td>
             </tr>
           ))}
@@ -155,6 +175,7 @@ export default function StateView() {
 
       <footer className="page-foot">
         <span>共 {total} 条状态后端管理记录</span>
+        {infoMessage && <span className="ok-text">{infoMessage}</span>}
         {errorMessage && <span className="error-text">{errorMessage}</span>}
       </footer>
     </section>

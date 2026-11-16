@@ -48,6 +48,16 @@ def create_entry(payload: EntryPayload) -> ActionResult:
     return ActionResult(ok=True, message="后端配置已登记", entry=entry)
 
 
+@router.post("/{entry_id}/inventory", response_model=ActionResult)
+def run_inventory(entry_id: int) -> ActionResult:
+    """对该后端配置执行快照盘点：读取存储路径、快照频率与状态大小，校验检查点引用后
+    写入状态快照数据清单；同一存储路径并发盘点只生成一份清单。"""
+    entry, message = service.run_inventory(entry_id)
+    if entry is None:
+        return ActionResult(ok=False, message=message)
+    return ActionResult(ok=True, message=message, entry=entry)
+
+
 @router.post("/{entry_id}/actions", response_model=ActionResult)
 def run_action(entry_id: int, payload: EntryPayload) -> ActionResult:
     """对单条后端配置执行启用后端、暂停后端、关闭后端；不允许的动作会被拦下并说明原因。"""

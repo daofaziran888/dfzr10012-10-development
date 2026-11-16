@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from app.services.snapshot import snapshot_service
 from app.store import store
 
 MODULE = "state"
@@ -45,6 +46,13 @@ class StateService:
         entry["abnormal"] = False
         rows.append(entry)
         return entry, []
+
+    def run_inventory(self, entry_id: int) -> tuple[dict[str, Any] | None, str]:
+        """对该后端配置做快照盘点：读取存储路径、快照频率、状态大小，写入状态快照数据清单。"""
+        entry = store.find(MODULE, entry_id)
+        if entry is None:
+            return None, f"后端配置 {entry_id} 不存在或已归档"
+        return snapshot_service.inventory_state_backend(entry)
 
     def run_action(self, entry_id: int, action: str) -> tuple[dict[str, Any] | None, str]:
         entry = store.find(MODULE, entry_id)

@@ -77,6 +77,18 @@ class StateEntry(BaseModel):
     field_6: str | None = None  # 快照频率
     field_7: str | None = None  # 配置状态
 
+class SnapshotEntry(BaseModel):
+    """快照清单明细结构。"""
+
+    field_0: str | None = None  # 清单编号
+    field_1: str | None = None  # 配置编号
+    field_2: str | None = None  # 存储路径
+    field_3: str | None = None  # 快照频率
+    field_4: str | None = None  # 状态大小
+    field_5: str | None = None  # 受保护文件
+    field_6: str | None = None  # 可清理文件
+    field_7: str | None = None  # 引用来源
+
 class CheckpointEntry(BaseModel):
     """检查点记录明细结构。"""
 

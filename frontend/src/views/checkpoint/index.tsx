@@ -45,6 +45,7 @@ export default function CheckpointView() {
   const [rows, setRows] = useState<Row[]>([])
   const [total, setTotal] = useState(0)
   const [errorMessage, setErrorMessage] = useState('')
+  const [infoMessage, setInfoMessage] = useState('')
   const [filters, setFilters] = useState<Record<string, string>>({})
   const filterFields = useMemo(() => columns.slice(0, 3), [])
 
@@ -70,6 +71,7 @@ export default function CheckpointView() {
 
   async function runAction(action: string, row: Row) {
     setErrorMessage('')
+    setInfoMessage('')
     try {
       const response = await request(`${ENDPOINT}/${row.id}/actions`, {
         method: 'POST',
@@ -77,6 +79,10 @@ export default function CheckpointView() {
       })
       if (!response.ok) {
         throw new Error('检查点恢复动作未生效，请稍后重试')
+      }
+      const payload = await response.json()
+      if (payload.message) {
+        setInfoMessage(payload.message)
       }
       await reload()
     } catch (error) {
@@ -155,6 +161,7 @@ export default function CheckpointView() {
 
       <footer className="page-foot">
         <span>共 {total} 条检查点恢复记录</span>
+        {infoMessage && <span className="ok-text">{infoMessage}</span>}
         {errorMessage && <span className="error-text">{errorMessage}</span>}
       </footer>
     </section>

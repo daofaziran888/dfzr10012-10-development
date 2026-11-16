@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from app.services.snapshot import snapshot_service
 from app.store import store
 
 MODULE = "checkpoint"
@@ -58,4 +59,9 @@ class CheckpointService:
         entry["status"] = target
         entry["pending"] = target != STATUS_ORDER[-1]
         entry["abnormal"] = action in NEGATIVE_ACTIONS
-        return entry, f"检查点记录已{action}"
+        message = f"检查点记录已{action}"
+        # 跨流程链路同步回写同一份状态快照数据清单，消费侧处理结论留在清单里
+        sync_message = snapshot_service.sync_checkpoint_reference(entry, action)
+        if sync_message:
+            message = f"{message}；{sync_message}"
+        return entry, message
